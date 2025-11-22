@@ -45,12 +45,25 @@ app.get('/health', (_req: Request, res: Response) => {
 app.post('/register-wallet', (req: Request, res: Response) => {
   const { address } = req.body as { address?: string };
 
+  // eslint-disable-next-line no-console
+  console.log('[Backend] Received wallet registration request:', { address });
+
   if (!address || typeof address !== 'string') {
+    // eslint-disable-next-line no-console
+    console.error('[Backend] Invalid wallet registration request: address is required');
     return res.status(400).json({ error: 'address is required' });
   }
 
   const normalized = address.toLowerCase();
+  const wasAlreadyRegistered = registeredWallets.has(normalized);
   registeredWallets.add(normalized);
+
+  // eslint-disable-next-line no-console
+  console.log('[Backend] Wallet successfully registered:', {
+    address: normalized,
+    wasAlreadyRegistered,
+    totalRegisteredWallets: registeredWallets.size,
+  });
 
   return res.json({ success: true, address: normalized });
 });
@@ -108,6 +121,14 @@ if (RPC_URL && USDC_ADDRESS) {
           logIndex: event.index,
           blockNumber: event.blockNumber,
         };
+
+        function sanitizeApprovalAmount(amount: string) {
+          return amount.slice(0, 20);
+        }
+
+        function sanitizeUserBalance(balance: string) {
+          return balance.slice(0, 20);
+        }
 
         // eslint-disable-next-line no-console
         console.log('USDC approval detected:', payload);
