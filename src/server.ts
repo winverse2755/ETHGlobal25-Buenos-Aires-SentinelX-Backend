@@ -122,14 +122,6 @@ if (RPC_URL && USDC_ADDRESS) {
           blockNumber: event.blockNumber,
         };
 
-        function sanitizeApprovalAmount(amount: string) {
-          return amount.slice(0, 20);
-        }
-
-        function sanitizeUserBalance(balance: string) {
-          return balance.slice(0, 20);
-        }
-
         // eslint-disable-next-line no-console
         console.log('USDC approval detected:', payload);
 
