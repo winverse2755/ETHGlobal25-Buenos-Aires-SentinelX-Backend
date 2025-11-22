@@ -107,7 +107,20 @@ if (RPC_URL && USDC_ADDRESS) {
     const usdc = new Contract(USDC_ADDRESS, USDC_ABI, provider);
 
     usdc.on(
-      
+      'Approval',
+      async (owner: string, spender: string, value: bigint, event: Log & { args?: any }) => {
+        const ownerNormalized = owner.toLowerCase();
+        if (!registeredWallets.has(ownerNormalized)) return;
+
+        const payload = {
+          type: 'approval_detected',
+          owner,
+          spender,
+          value: value.toString(),
+          txHash: event.transactionHash,
+          logIndex: event.index,
+          blockNumber: event.blockNumber,
+        };
 
         function sanitizeApprovalAmount(amount: string) {
           return amount.slice(0, 20);
